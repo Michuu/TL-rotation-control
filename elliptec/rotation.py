@@ -36,8 +36,9 @@ class Motor(serial.Serial):
 				command += data.encode('utf-8')
 
 			self.request = command
+			print(command)
 			self.write(command)
-			self.response = self.read_until(terminator=b'\n')
+			self.response = self.read_until(expected=b'\n')
 			self.status = parse(self.response)
 			move_check(self.status)
 
@@ -53,7 +54,7 @@ class Motor(serial.Serial):
 
 			self.write(command)
 			#print(command)
-			response = self.read_until(terminator=b'\n')
+			response = self.read_until(expected=b'\n')
 			#print(response)
 			self.status = parse(response)
 			error_check(self.status)
@@ -70,10 +71,11 @@ class Motor(serial.Serial):
 
 			self.write(command)
 			#print(command)
-			response = self.read_until(terminator=b'\n')
-			print(response)
+			response = self.read_until(expected=b'\n')
+			#print(response)
 			self.status = parse(response)
 			error_check(self.status)
+			return self.status
 
 	def deg_to_hex(self, deg):
 		factor = self.counts_per_rev//self.range
@@ -82,7 +84,7 @@ class Motor(serial.Serial):
 
 	def hex_to_deg(self, hexval):
 		factor = self.counts_per_rev//self.range
-		val = round(int(val,16)/factor)
+		val = round(int(hexval,16)/factor)
 		return val
 
 
@@ -98,7 +100,7 @@ class Motor(serial.Serial):
 			command += msg
 		#print(command)
 		self.write(command)
-		response = self.read_until(terminator=b'\n')
+		response = self.read_until(expected=b'\n')
 		#print(response)
 		return parse(response)
 
@@ -109,7 +111,16 @@ class Motor(serial.Serial):
 		return string
 
 
-	
+## higher level
+	def move_absolute(self, pos):
+		self.do_('absolute',self.deg_to_hex(pos))
+
+	def get_position(self):
+		pos=self.get_('position')
+		return pos[1]/(self.counts_per_rev//self.range)
+
+	def home(self):
+		self.do_('home')
 
 
 
