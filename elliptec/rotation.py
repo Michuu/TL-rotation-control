@@ -123,7 +123,7 @@ class Motor(serial.Serial):
 
 ## higher level
 	def move_absolute(self, pos):
-		self.do_('absolute',self.deg_to_hex(pos))
+		self.do_('absolute',self.deg_to_hex_2scomplement(pos))
 
 	def get_position(self):
 		pos=self.get_('position')
