@@ -3,7 +3,6 @@ from .cmd import get_, set_, mov_
 from .helper import parse, error_check, move_check
 import sys
 from . import status
-import numpy as np
 
 
 class Motor(serial.Serial):
@@ -88,16 +87,7 @@ class Motor(serial.Serial):
 		val = round(int(hexval,16)/factor)
 		return val
 
-	def deg_to_hex_2scomplement(self, deg):
-		factor = self.counts_per_rev//self.range
-		isneg = (deg<0)
-		deg = abs(deg)
-		val = deg*factor
-		if isneg:
-			val=hex((~np.uint32(val))+np.uint32(1))
-		else:
-			val=hex(val)
-		return val.replace('0x','').zfill(8).upper()
+
 ## Private methods
 
 	def _get_motor_info(self):
@@ -133,8 +123,7 @@ class Motor(serial.Serial):
 		self.do_('home')
 
 
-	def move_relative(self,pos):
-		self.do_('relative',self.deg_to_hex_2scomplement(pos))
+
 	
 
 
